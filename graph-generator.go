@@ -240,7 +240,6 @@ func writeGraphToFile(g *graph, filepath string) {
 			// Destination as an integer
 			d := s.(int)
 
-			//row := strconv.Itoa(source) + "," + strconv.Itoa(d)
 			fmt.Fprintf(outputFile, "%v,%v\n", source, d)
 		})
 	}
