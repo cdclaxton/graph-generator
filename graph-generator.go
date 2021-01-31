@@ -70,6 +70,7 @@ func (g *graph) addEdge(v1 int, v2 int) {
 	g.edges[lower].Insert(upper)
 }
 
+// hasEdge returns whether an undirected edge exists between two vertices
 func (g *graph) hasEdge(v1 int, v2 int) bool {
 
 	// Preconditions
@@ -92,6 +93,7 @@ func (g *graph) hasEdge(v1 int, v2 int) bool {
 	return g.edges[lower].Has(upper)
 }
 
+// buildRandomGraphFixedNumEdges builds a random graph with a given number of edges
 func buildRandomGraphFixedNumEdges(numberVertices int, numberEdgesRequired int) *graph {
 
 	// Preconditions
@@ -113,7 +115,7 @@ func buildRandomGraphFixedNumEdges(numberVertices int, numberEdgesRequired int) 
 	for numberEdges < numberEdgesRequired {
 
 		if numberEdges%500000 == 0 && lastNumberEdgesDisplay != numberEdges {
-			fmt.Printf("[>] Added %v edges\n", numberEdges)
+			fmt.Printf("[>] Number of edges created: %v\n", numberEdges)
 			lastNumberEdgesDisplay = numberEdges
 		}
 
@@ -130,6 +132,7 @@ func buildRandomGraphFixedNumEdges(numberVertices int, numberEdgesRequired int) 
 			continue
 		}
 
+		// Add the edge to the graph
 		g.addEdge(v1, v2)
 		numberEdges++
 	}
@@ -170,11 +173,13 @@ func buildRandomGraph(numberOfVertices int, probConnection float64) *graph {
 	return g
 }
 
+// graphSummary represents the summary statistics of the graph
 type graphSummary struct {
 	numberVertices int // number of vertices with connections
 	numberEdges    int // number of edges
 }
 
+// calcGraphSummary calculates summary statistics of the graph
 func calcGraphSummary(g *graph) graphSummary {
 
 	connectedVertices := set.New()
@@ -182,16 +187,26 @@ func calcGraphSummary(g *graph) graphSummary {
 
 	for source, destinations := range g.edges {
 
-		if destinations.Len() > 0 {
-			connectedVertices.Insert(source)
+		// If there are no connections, move to the next vertex
+		if destinations.Len() == 0 {
+			continue
 		}
+
+		connectedVertices.Insert(source)
 
 		destinations.Do(func(s interface{}) {
 			// Destination as an integer
 			d := s.(int)
 
-			connectedVertices.Insert(d)
+			if !connectedVertices.Has(d) {
+				connectedVertices.Insert(d)
+			}
+
 			numberEdges++
+
+			if numberEdges%5000000 == 0 {
+				fmt.Printf("[>] Processed %v edges\n", numberEdges)
+			}
 		})
 	}
 
@@ -213,6 +228,11 @@ func writeGraphToFile(g *graph, filepath string) {
 
 	// Walk through the source vertices
 	for source, destinations := range g.edges {
+
+		// If there are no connections, move to the next vertex
+		if destinations.Len() == 0 {
+			continue
+		}
 
 		// Walk through the set of destination vertices
 		destinations.Do(func(s interface{}) {
@@ -251,20 +271,22 @@ func buildRandomGraphFile(
 		g = buildRandomGraph(numberOfVertices, probConnection)
 	}
 
-	fmt.Printf("[>] Graph created in %v\n", time.Now().Sub(t0))
+	fmt.Printf("[>] Time taken to build graph: %v\n", time.Now().Sub(t0))
 
 	// Summarise the graph
 	t1 := time.Now()
+	fmt.Printf("[>] Calculating graph summary ...\n")
 	summary := calcGraphSummary(g)
-	fmt.Printf("[>] Generated graph summary:\n")
+	fmt.Printf("[>] Graph summary:\n")
 	fmt.Printf("    Number of vertices: %v\n", summary.numberVertices)
 	fmt.Printf("    Number of edges:    %v\n", summary.numberEdges)
 	fmt.Printf("[>] Time taken to calculate summary: %v\n", time.Now().Sub(t1))
 
-	// Write the graph to the output file
+	// Write the graph to file
 	t2 := time.Now()
+	fmt.Printf("[>] Writing graph to %v ...\n", outputFilepath)
 	writeGraphToFile(g, outputFilepath)
-	fmt.Printf("[>] Graph written to file in %v\n", time.Now().Sub(t2))
+	fmt.Printf("[>] Time taken to write graph to file: %v\n", time.Now().Sub(t2))
 
 	fmt.Printf("[>] Total time taken: %v\n", time.Now().Sub(t0))
 }
