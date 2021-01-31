@@ -17,19 +17,19 @@ If a vertex doesn't have any edges, it is not written to the adjacency file.
 ./graph-generator.exe -h
 ```
 
-- To generate a random graph with 1000 vertices a fixed probability of an edge of 0.1:
+- Generate a random graph with 1000 vertices and a fixed probability of an edge of 0.1:
 
 ```
 ./graph-generator.exe -n 1000 -p 0.1 -output edges.csv
 ```
 
-- To generate a random graph with 1,000 vertices and 100 edges:
+- Generate a random graph with 1,000 vertices and 100 edges:
 
 ```
 ./graph-generator.exe -n 1000 -e 100 -output edges.csv
 ```
 
-- To generate a network with 50,000,000 vertices and 40,000,000 edges:
+- Generate a network with 50,000,000 vertices and 40,000,000 edges:
 
 ```
 ./graph-generator.exe -n 50000000 -e 40000000 -output edges.csv
